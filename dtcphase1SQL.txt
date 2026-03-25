@@ -1,0 +1,360 @@
+*** Original
+
+create schema dtc;
+use dtc;
+create table Dentist(
+  Dentist_ID integer not null auto_increment,
+  Dentist_First_Name varchar(35) not null,
+  Dentist_Middle_Name varchar(35),
+  Dentist_Last_Name varchar(35) not null,
+  Dentist_Join_Date DATE not null,
+  constraint Dentist_PK primary key (Dentist_ID));
+
+create table Account(
+  Account_ID integer not null auto_increment,
+  Account_Balance integer not null,
+  constraint Account_PK primary key (Account_ID));
+
+create table Payment(
+  Payment_ID integer not null auto_increment,
+  Payment_Date DATE not null,
+  Payment_Amount integer not null,
+  Account_ID integer not null,
+  constraint Payment_PK primary key (Payment_ID),
+  constraint Payment_FK foreign key (Account_ID) references Account(Account_ID) on delete cascade);
+
+create table Patient(
+  Patient_ID integer not null auto_increment,
+  Account_ID integer not null,
+  Patient_First_Name varchar(35) not null,
+  Patient_Middle_Name varchar(35) not null,
+  Patient_Last_Name varchar(35) not null,
+  Patient_Street varchar(35) not null,
+  Patient_City varchar(35) not null,
+  Patient_State varchar(2) not null,
+  Patient_Zip varchar(5) not null,
+  Patient_Phone_Primary varchar(10) not null,
+  Patient_Phone_Secondary varchar(10) not null,
+  Patient_SSN varchar(9) not null,
+  Patient_DOB date not null,
+  Patient_Minor boolean not null,
+  Patient_Head_Of_House integer,
+  Patient_Allergies varchar(35) not null,
+  constraint Patient_PK primary key (Patient_ID),
+  constraint Patient_FK foreign key (Account_ID) references Account(Account_ID) on delete cascade);
+
+create table Patient_1(
+  Patient_ID integer not null auto_increment,
+  Account_ID integer not null,
+  Patient_First_Name varchar(35) not null,
+  Patient_Middle_Name varchar(35) not null,
+  Patient_Last_Name varchar(35) not null,
+  Patient_Street varchar(35) not null,
+  Patient_City varchar(35) not null,
+  Patient_State varchar(2) not null,
+  Patient_Zip varchar(5) not null,
+  Patient_Phone_Primary varchar(10) not null,
+  Patient_Phone_Secondary varchar(10) not null,
+  Patient_SSN varchar(9) not null,
+  Patient_DOB date not null,
+  Patient_Minor boolean not null,
+  Patient_Head_Of_House integer,
+  Patient_Allergies varchar(35) not null,
+  constraint Patient_PK primary key (Patient_ID),
+  constraint Patient1_FK1 foreign key (Account_ID) references Account(Account_ID) on delete cascade,
+  constraint Patient1_FK2 foreign key (Patient_Head_Of_House) references Patient(Patient_ID) on delete cascade);
+
+  
+create table Appointment(
+  Appointment_ID integer not null auto_increment,
+  Dentist_ID integer not null,
+  Patient_ID integer not null,
+  Appointment_Date DATE not null,
+  Appointment_Time TIME not null,
+  constraint Appointment_PK primary key (Appointment_ID),
+  constraint Appointment_FK1 foreign key (Dentist_ID) references Dentist (Dentist_ID) on delete cascade,
+  constraint Appointment_FK2 foreign key (Patient_ID) references Patient (Patient_ID) on delete cascade);
+
+
+create table Service(
+  Service_ID integer not null auto_increment,
+  Service_Description varchar(100) not null,
+  Service_Cost integer not null,
+  constraint Service_PK primary key (Service_ID));
+
+
+create table Visit(
+  Visit_ID integer not null auto_increment,
+  Dentist_ID integer not null,
+  Patient_ID integer not null,
+  Visit_Date DATE not null,
+  Visit_Time TIME not null,
+  constraint Visit_PK primary key (Visit_ID),
+  constraint Visit_FK1 foreign key (Dentist_ID) references Dentist(Dentist_ID) on delete cascade,
+  constraint Visit_FK2 foreign key (Patient_ID) references Patient(Patient_ID) on delete cascade);
+
+create table Scheduled_Service(
+  Scheduled_Service_ID integer not null auto_increment,
+  Appointment_ID integer not null,
+  Service_ID integer not null,
+  constraint Scheduled_Service_PK primary key (Scheduled_Service_ID),
+  constraint Scheduled_Service_FK1 foreign key (Appointment_ID) references Appointment(Appointment_ID) on delete cascade,
+  constraint Scheduled_Service_FK2 foreign key (Service_ID) references Service(Service_ID) on delete cascade); 
+  
+  
+create table Completed_Service(
+  Completed_Service_ID integer not null auto_increment,
+  Service_ID integer not null,
+  Visit_ID integer not null,
+  constraint Completed_Service_PK primary key (Completed_Service_ID),
+  constraint Completed_Service_FK1 foreign key (Service_ID) references Service(Service_ID) on delete cascade,
+  constraint Completed_Service_FK2 foreign key (Visit_ID) references Visit(Visit_ID) on delete cascade); 
+
+-- *** DTC Dental Database Master Script ***
+-- Creates schema, tables, constraints, and sample data
+
+-- Create schema
+create schema dtc;
+
+-- Use schema
+use dtc;
+
+
+-- *** Table Creation ***
+
+-- Dentist table stores dentist basic information
+create table Dentist(
+  Dentist_ID integer not null auto_increment,
+  Dentist_First_Name varchar(35) not null,
+  Dentist_Middle_Name varchar(35),
+  Dentist_Last_Name varchar(35) not null,
+  Dentist_Join_Date DATE not null,
+  constraint Dentist_PK primary key (Dentist_ID));
+
+-- Account table stores balances for patient accounts
+create table Account(
+  Account_ID integer not null auto_increment,
+  Account_Balance DECIMAL (10,2) not null,
+  constraint Account_PK primary key (Account_ID));
+
+-- Payment table: Stores payment records (date, amount, patient account)
+create table Payment(
+  Payment_ID integer not null auto_increment,
+  Payment_Date DATE not null,
+  Payment_Amount DECIMAL (10,2) not null,
+  Account_ID integer not null,
+  constraint Payment_PK primary key (Payment_ID),
+  constraint Payment_FK foreign key (Account_ID) references Account(Account_ID) on delete cascade);
+
+-- Patient table: Stores patient personal information
+create table Patient(
+  Patient_ID integer not null auto_increment,
+  Account_ID integer not null,
+  Patient_First_Name varchar(35) not null,
+  Patient_Middle_Name varchar(35) not null,
+  Patient_Last_Name varchar(35) not null,
+  Patient_Street varchar(35) not null,
+  Patient_City varchar(35) not null,
+  Patient_State varchar(2) not null,
+  Patient_Zip varchar(5) not null,
+  Patient_Phone_Primary varchar(15) not null,
+  Patient_Phone_Secondary varchar(15) not null,
+  Patient_SSN varchar(9) not null,
+  Patient_DOB date not null,
+  Patient_Minor boolean not null,
+  Patient_Head_Of_House integer,
+  Patient_Allergies varchar(35) not null,
+  constraint Patient_PK primary key (Patient_ID),
+  constraint Patient_FK foreign key (Account_ID) references Account(Account_ID) on delete cascade,
+  constraint Patient_FK2 foreign key (Patient_Head_Of_House) references Patient(Patient_ID) on delete cascade);
+
+
+
+-- Appointment table: Stores information regarding future appointments (dentist, patient, date/time) 
+create table Appointment(
+  Appointment_ID integer not null auto_increment,
+  Dentist_ID integer not null,
+  Patient_ID integer not null,
+  Appointment_Date DATE not null,
+  Appointment_Time TIME not null,
+  constraint Appointment_PK primary key (Appointment_ID),
+  constraint Appointment_FK1 foreign key (Dentist_ID) references Dentist (Dentist_ID) on delete cascade,
+  constraint Appointment_FK2 foreign key (Patient_ID) references Patient (Patient_ID) on delete cascade);
+
+
+-- Service table: Stores information regarding services provided (code, description, cost) 
+create table Service(
+  Service_ID integer not null auto_increment,
+  Service_Description varchar(100) not null,
+  Service_Cost DECIMAL (10,2) not null,
+  constraint Service_PK primary key (Service_ID));
+
+-- Visit table: Stores information regarding previous visits (appointments attended) (dentist, patient, date/time) 
+create table Visit(
+  Visit_ID integer not null auto_increment,
+  Dentist_ID integer not null,
+  Patient_ID integer not null,
+  Visit_Date DATE not null,
+  Visit_Time TIME not null,
+  constraint Visit_PK primary key (Visit_ID),
+  constraint Visit_FK1 foreign key (Dentist_ID) references Dentist(Dentist_ID) on delete cascade,
+  constraint Visit_FK2 foreign key (Patient_ID) references Patient(Patient_ID) on delete cascade);
+
+-- Scheduled service table: Links future appointments to the service that is scheduled to be provided in the appointment.
+create table Scheduled_Service(
+  Scheduled_Service_ID integer not null auto_increment,
+  Appointment_ID integer not null,
+  Service_ID integer not null,
+  constraint Scheduled_Service_PK primary key (Scheduled_Service_ID),
+  constraint Scheduled_Service_FK1 foreign key (Appointment_ID) references Appointment(Appointment_ID) on delete cascade,
+  constraint Scheduled_Service_FK2 foreign key (Service_ID) references Service(Service_ID) on delete cascade); 
+  
+-- Completed service table: Links past visits to the service that was provided in the visit  
+create table Completed_Service(
+  Completed_Service_ID integer not null auto_increment,
+  Service_ID integer not null,
+  Visit_ID integer not null,
+  constraint Completed_Service_PK primary key (Completed_Service_ID),
+  constraint Completed_Service_FK1 foreign key (Service_ID) references Service(Service_ID) on delete cascade,
+  constraint Completed_Service_FK2 foreign key (Visit_ID) references Visit(Visit_ID) on delete cascade); 
+  
+  
+  
+-- *** Data Population ***
+
+-- Generates account IDs (auto-increment) and inputs account balances into Account table, taking into previous visits and payments
+INSERT INTO Account (Account_Balance) 
+VALUES
+(50),
+(0),
+(90),
+(80),
+(32),
+(144),
+(212),
+(0),
+(0),
+(0);
+
+-- Generates dentist IDs (auto-increment) and inputs dentist information into Dentist table
+INSERT INTO Dentist (Dentist_First_Name, Dentist_Middle_Name, Dentist_Last_Name, Dentist_Join_Date)
+VALUES
+('John','A','Smith','2006-02-01'),
+('Mary','B','Johnson','2008-05-10'),
+('David','C','Brown','2010-08-15'),
+('Alice','D','Taylor','2013-01-10'),
+('Bob','E','Miller','2013-05-20'),
+('Laura','F','Davis','2017-11-30'),
+('Michael','G','Wilson','2018-06-05'),
+('Sarah','H','Anderson','2019-09-12'),
+('James','I','Thomas','2022-04-23'),
+('Emma','J','Moore','2023-02-14');
+
+-- Generates patient IDs (auto-increment) and inputs patient information into Patient table
+-- *** Family members may share the same account (Head of House field identifies the responsible adult) *** --
+INSERT INTO Patient
+(Account_ID, Patient_First_Name, Patient_Middle_Name, Patient_Last_Name,
+Patient_Street, Patient_City, Patient_State, Patient_Zip,
+Patient_Phone_Primary, Patient_Phone_Secondary,
+Patient_SSN, Patient_DOB, Patient_Minor,
+Patient_Head_Of_House, Patient_Allergies)
+VALUES
+(1,'Alex','M','Hill','101 Broadway','Englewood','CO','80113','3035551001','3035552001','123456781','1990-04-12',0,NULL,'None'),
+(2,'Taylor','N','Green','225 Oak Ave','Aurora','CO','80012','7205551002','7205552002','123456782','1985-06-22',0,NULL,'None'),
+(3,'Jordan','O','White','512 Pine St','Lakewood','CO','80226','3035551003','3035552003','123456783','1986-01-14',0,NULL,'Peanuts'),
+(3,'Chris','P','White','512 Pine St','Lakewood','CO','80226','3035551004','3035552004','123456784','2011-09-09',1,3,'None'),
+(4,'Pat','Q','Young','890 Cedar Dr','Englewood','CO','80110','3035551005','3035552005','123456785','1996-11-02',0,NULL,'Latex'),
+(5,'Sam','R','King','740 Birch Ln','Westminster','CO','80031','7205551006','7205552006','123456786','1988-03-18',0,NULL,'None'),
+(6,'Lee','S','Scott','665 Maple Ave','Littleton','CO','80120','3035551007','3035552007','123456787','1992-12-11',0,NULL,'None'),
+(7,'Drew','T','Adams','432 Walnut St','Englewood','CO','80113','7205551008','7205552008','123456788','1982-04-03',0,NULL,'Penicillin'),
+(7,'Casey','U','Adams','432 Walnut St','Englewood','CO','80113','7205551009','7205552009','123456789','2008-07-10',1,8,'None'),
+(7,'Riley','V','Adams','432 Walnut St','Englewood','CO','80113','7205551010','7205552010','123456790','2010-09-21',1,8,'None');
+
+-- Generate payment IDs (auto-increment) and inputs previous payments into Payment table
+INSERT INTO Payment (Payment_Date, Payment_Amount, Account_ID)
+VALUES
+('2023-09-21',15,1),
+('2023-10-21',20,1),
+('2023-11-21',20,1),
+('2023-12-21',20,1),
+('2024-03-22',15,1),
+('2024-03-25',30,3),
+('2024-04-25',40,3),
+('2024-05-25',40,3),
+('2024-03-26',15,3),
+('2024-04-26',20,3),
+('2024-05-26',20,3),
+('2024-03-27',20,4),
+('2024-04-27',20,4),
+('2024-05-27',20,4),
+('2024-03-28',16,5),
+('2024-04-28',16,5),
+('2024-05-28',16,5),
+('2024-03-29',36,6),
+('2024-04-29',36,6),
+('2024-05-29',36,6),
+('2024-04-01',15,7),
+('2024-05-01',20,7),
+('2024-06-01',20,7),
+('2024-06-02',24,7),
+('2024-06-02',24,7);
+
+-- Generates service IDs (auto-increment) and inputs service service information into Service table
+INSERT INTO Service (Service_Description, Service_Cost)
+VALUES
+('Dental Cleaning',100.00),
+('Dental X-Ray',80.00),
+('Tooth Filling',150.00),
+('Teeth Whitening',200.00),
+('Routine Checkup',75.00),
+('Root Canal',500.00),
+('Braces Consultation',120.00),
+('Cavity Sealant',50.00),
+('Gum Treatment',180.00),
+('Mouth Guard',90.00);
+
+-- Generates appointment IDs (auto-increment) and inputs future appointment details into Appointment table
+INSERT INTO Appointment (Dentist_ID, Patient_ID, Appointment_Date, Appointment_Time)
+VALUES
+(1,1,'2024-09-23','09:00:00'),
+(2,2,'2024-10-07','10:00:00'),
+(3,3,'2024-08-25','11:00:00'),
+(4,4,'2024-09-01','13:00:00'),
+(5,5,'2024-09-27','14:00:00'),
+(6,6,'2024-09-14','15:00:00'),
+(7,7,'2024-10-21','09:30:00'),
+(8,8,'2024-10-02','10:30:00'),
+(9,9,'2024-10-03','11:30:00'),
+(10,10,'2024-10-04','12:30:00');
+
+-- Generates visit IDs (auto-increment) and inputs details of previous visits into Visit table
+INSERT INTO Visit (Dentist_ID, Patient_ID, Visit_Date, Visit_Time)
+VALUES
+(1,1,'2023-09-21','09:00:00'),
+(1,1,'2024-03-22','10:00:00'),
+(2,3,'2024-03-25','11:00:00'),
+(3,4,'2024-03-26','13:00:00'),
+(4,5,'2024-03-27','14:00:00'),
+(5,6,'2024-03-28','15:00:00'),
+(6,7,'2024-03-29','09:30:00'),
+(7,8,'2024-04-01','10:30:00'),
+(8,9,'2024-06-02','11:30:00'),
+(9,10,'2024-06-02','12:30:00');
+
+-- Inputs link between future appointments and service to be provided to Scheduled_Service table.
+INSERT INTO Scheduled_Service (Appointment_ID, Service_ID)
+VALUES
+(1,5),(2,2),(3,3),(4,7),(5,5),
+(6,4),(7,9),(8,5),(9,5),(10,5);
+
+-- Inputs link between past visits and service that was provided to Completed_Service table.
+INSERT INTO Completed_Service (Service_ID, Visit_ID)
+VALUES
+(5,1),(5,2),(3,3),(5,4),(1,5),
+(2,6),(9,7),(5,8),(7,9),(7,10);
+
+*** Queries ***
+
+SELECT Patient_City, COUNT(*) AS 'Number of Patients'
+FROM Patient
+GROUP BY Patient_City;
